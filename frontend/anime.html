@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AnimeList — аниме</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Onest:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="index.html">AnimeList</a>
+    <p>Каталог аниме с отзывами и рейтингом</p>
+  </header>
+
+  <main class="detail">
+    <a class="back" href="index.html">Вернуться в каталог</a>
+
+    <!-- Показывай вместо #anime, если API вернул 404 -->
+    <section class="page-error" id="page-error" hidden>
+      <h1>Такого аниме нет в каталоге</h1>
+      <p>Возможно, его удалили. <a href="index.html">Открыть каталог</a></p>
+    </section>
+
+    <!-- Данные из GET /anime/{id} -->
+    <article class="anime" id="anime">
+      <!-- data-status задаёт цвет корешка -->
+      <div class="cover" id="cover" data-status="finished" aria-hidden="true">
+        <span id="cover-title"></span>
+      </div>
+
+      <div>
+        <h1 id="title">Загрузка…</h1>
+
+        <dl class="facts">
+          <div><dt>Год</dt><dd id="year">—</dd></div>
+          <div><dt>Серий</dt><dd id="episodes">—</dd></div>
+          <div><dt>Статус</dt><dd id="status">—</dd></div>
+        </dl>
+
+        <!-- li на каждый жанр из поля genres -->
+        <ul class="genres" id="genres" aria-label="Жанры"></ul>
+
+        <!-- Данные из GET /anime/{id}/rating -->
+        <div class="rating">
+          <span class="rating-score" id="rating-score">—</span>
+          <span class="rating-scale">/ 10</span>
+          <span class="rating-count" id="rating-count">Оценок пока нет</span>
+        </div>
+      </div>
+    </article>
+
+    <div class="reviews-layout">
+      <!-- Данные из GET /anime/{id}/reviews -->
+      <section aria-labelledby="reviews-title">
+        <h2 id="reviews-title">Отзывы</h2>
+        <ul class="review-list" id="review-list"></ul>
+        <p class="empty" id="reviews-empty" hidden>Отзывов пока нет. Оставьте первый.</p>
+
+        <nav class="pager" aria-label="Страницы отзывов">
+          <button class="button button-quiet" id="reviews-prev" type="button">Назад</button>
+          <span class="page-number" id="reviews-page">Страница 1</span>
+          <button class="button button-quiet" id="reviews-next" type="button">Вперёд</button>
+        </nav>
+      </section>
+
+      <!-- Отправка в POST /anime/{id}/reviews -->
+      <form class="review-form" id="review-form" novalidate>
+        <h2>Ваш отзыв</h2>
+
+        <div class="field">
+          <label for="author">Имя</label>
+          <input id="author" name="author" maxlength="50" required autocomplete="nickname">
+        </div>
+
+        <fieldset class="score-scale field">
+          <legend>Оценка</legend>
+          <div class="score-options">
+            <label><input type="radio" name="score" value="1"><span>1</span></label>
+            <label><input type="radio" name="score" value="2"><span>2</span></label>
+            <label><input type="radio" name="score" value="3"><span>3</span></label>
+            <label><input type="radio" name="score" value="4"><span>4</span></label>
+            <label><input type="radio" name="score" value="5"><span>5</span></label>
+            <label><input type="radio" name="score" value="6"><span>6</span></label>
+            <label><input type="radio" name="score" value="7"><span>7</span></label>
+            <label><input type="radio" name="score" value="8"><span>8</span></label>
+            <label><input type="radio" name="score" value="9"><span>9</span></label>
+            <label><input type="radio" name="score" value="10"><span>10</span></label>
+          </div>
+        </fieldset>
+
+        <div class="field">
+          <label for="text">Текст <span class="hint">необязательно, до 1000 символов</span></label>
+          <textarea id="text" name="text" rows="5" maxlength="1000"></textarea>
+        </div>
+
+        <button class="button" type="submit">Оставить отзыв</button>
+
+        <!-- data-type="error" — красный, data-type="success" — зелёный -->
+        <p class="form-message" id="form-message" aria-live="polite"></p>
+      </form>
+    </div>
+  </main>
+
+  <!-- ШАБЛОН отзыва -->
+  <template id="review-item">
+    <li class="review">
+      <span class="review-score"></span>
+      <div>
+        <p class="review-author"></p>
+        <p class="review-text"></p>
+      </div>
+    </li>
+  </template>
+
+  <script src="anime.js"></script>
+</body>
+</html>

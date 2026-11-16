@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AnimeList — каталог</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Onest:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="index.html">AnimeList</a>
+    <p>Каталог аниме с отзывами и рейтингом</p>
+  </header>
+
+  <!-- Топ: заполняется из GET /anime/top -->
+  <section class="top" aria-labelledby="top-title">
+    <h1 id="top-title">Лучшее по оценкам зрителей</h1>
+    <ol class="top-list" id="top-list"></ol>
+  </section>
+
+  <main class="catalog">
+    <!-- Фильтры: значения уходят в query-параметры GET /anime -->
+    <form class="filters" id="filters">
+      <h2>Фильтры</h2>
+
+      <div class="field">
+        <label for="genre">Жанр</label>
+        <!-- опции заполняются из GET /genres -->
+        <select id="genre" name="genre">
+          <option value="">Все жанры</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="status">Статус</label>
+        <select id="status" name="status">
+          <option value="">Любой</option>
+          <option value="ongoing">Выходит</option>
+          <option value="finished">Вышло</option>
+          <option value="announced">Анонс</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="min_year">Не раньше года</label>
+        <input id="min_year" name="min_year" type="number" min="1960" max="2030" placeholder="например, 2010">
+      </div>
+
+      <div class="field">
+        <label for="sort_by">Сортировка</label>
+        <select id="sort_by" name="sort_by">
+          <option value="id">По дате добавления</option>
+          <option value="year">По году</option>
+          <option value="title">По названию</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="order">Порядок</label>
+        <select id="order" name="order_by">
+          <option value="ASC">По возрастанию</option>
+          <option value="DESC">По убыванию</option>
+        </select>
+      </div>
+
+      <button class="button" type="submit">Показать</button>
+      <button class="button button-quiet" type="reset">Сбросить</button>
+    </form>
+
+    <section class="shelf" aria-labelledby="shelf-title">
+      <div class="shelf-head">
+        <h2 id="shelf-title">Каталог</h2>
+        <!-- сюда пишешь «Найдено: N» / «Загрузка…» / текст ошибки -->
+        <p class="list-status" id="list-status" aria-live="polite"></p>
+      </div>
+
+      <!-- Корешки: заполняются из GET /anime по шаблону #anime-card -->
+      <ul class="shelf-grid" id="anime-list"></ul>
+
+      <!-- Показывай, когда список пустой (скрыт по умолчанию) -->
+      <p class="empty" id="empty" hidden>По этим фильтрам ничего не нашлось. Попробуйте убрать жанр или год.</p>
+
+      <ul class="legend" aria-label="Цвет корешка">
+        <li style="--c: var(--ongoing)">Выходит</li>
+        <li style="--c: var(--finished)">Вышло</li>
+        <li style="--c: var(--announced)">Анонс</li>
+      </ul>
+
+      <nav class="pager" aria-label="Страницы">
+        <button class="button button-quiet" id="prev-page" type="button">Назад</button>
+        <span class="page-number" id="page-number">Страница 1</span>
+        <button class="button button-quiet" id="next-page" type="button">Вперёд</button>
+      </nav>
+    </section>
+  </main>
+
+  <!-- ШАБЛОНЫ: клонируй через template.content.cloneNode(true) и заполняй -->
+
+  <!-- Корешок аниме. data-status = ongoing | finished | announced (от него цвет) -->
+  <template id="anime-card">
+    <li class="spine" data-status="finished">
+      <a class="spine-link" href="anime.html?id=">
+        <span class="spine-year"></span>
+        <span class="spine-title"></span>
+        <span class="spine-status"></span>
+      </a>
+    </li>
+  </template>
+
+  <!-- Строка топа. Номер места ставится сам через CSS -->
+  <template id="top-item">
+    <li class="top-item">
+      <a href="anime.html?id=">
+        <span class="top-score"></span>
+        <span class="top-title"></span>
+        <span class="top-count"></span>
+      </a>
+    </li>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
