@@ -1,25 +1,26 @@
-from typing import List, Dict, Annotated, Optional, Literal
+from typing import Annotated, Literal
 from pydantic import BaseModel, Field
 from fastapi import Depends, Query, Path, HTTPException
 from db import DB
+from models import AnimeORM, GenresORM
 
 ### проверка на 404
-def except404_anime(db: DB, anime_id: Annotated[int, Path(ge=1)]) -> Dict:
-    response = db.execute("SELECT * FROM anime WHERE id = %s", (anime_id,)).fetchone()
+def except404_anime(db: DB, anime_id: Annotated[int, Path(ge=1)]) -> AnimeORM:
+    response = db.get(AnimeORM, anime_id)
     if response is None:
         raise HTTPException(status_code=404, detail=f"Элемента с id {anime_id} не найдено")
     return response 
 
-ErrorCheckAnime = Annotated[Dict, Depends(except404_anime)]
+ErrorCheckAnime = Annotated[AnimeORM, Depends(except404_anime)]
 
 
-def except404_genre(db: DB, genre_id: Annotated[int, Path(ge=1)]) -> Dict:
-    response = db.execute("SELECT * FROM genres WHERE id = %s", (genre_id,)).fetchone()
+def except404_genre(db: DB, genre_id: Annotated[int, Path(ge=1)]) -> GenresORM:
+    response = db.get(GenresORM, genre_id)
     if response is None:
         raise HTTPException(status_code=404, detail=f"Элемента с id {genre_id} не найдено")
     return response 
 
-ErrorCheckGenre = Annotated[Dict, Depends(except404_genre)]
+ErrorCheckGenre = Annotated[GenresORM, Depends(except404_genre)]
 
 ### пагинация
 class PaginationParams(BaseModel):
@@ -29,11 +30,18 @@ class PaginationParams(BaseModel):
 Pagination = Annotated[PaginationParams, Query()]
 
 ### сортировка
-Sort = Literal["id", "year", "title"]
-Order = Literal["ASC", "DESC"]
-def sort(db: DB, sort_by: Sort = "id", order_by: Order = "ASC") -> str:
-    sorted = (f" ORDER BY anime.{sort_by} {order_by}")
-    return sorted
+class SortParams(BaseModel):
 
-Sorted = Annotated[str, Depends(sort)]
+    sort : Literal["id", "year", "title"] = "id"
+    order: Literal["ASC", "DESC"] = "ASC"
+
+
+Sorting = Annotated[SortParams, Query()]
+
+
+class OrderParams(BaseModel):
+    order: Literal["ASC", "DESC"] = "ASC"
+
+
+OrderOnly = Annotated[OrderParams, Query()]
 

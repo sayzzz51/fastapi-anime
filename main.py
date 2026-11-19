@@ -1,6 +1,6 @@
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
-from routers import anime, genres, reviews
+from routers import anime, genres
 
 app = FastAPI()
 
@@ -13,4 +13,3 @@ app.add_middleware(
 
 app.include_router(anime.router)
 app.include_router(genres.router)
-app.include_router(reviews.router)

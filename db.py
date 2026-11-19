@@ -1,18 +1,21 @@
-from fastapi import FastAPI, Depends
+import os 
 from typing import Annotated
-import psycopg
-from psycopg.rows import dict_row
-
-app = FastAPI()
-
-import os
 from dotenv import load_dotenv
+from fastapi import Depends
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, Session, DeclarativeBase
 
 load_dotenv()
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("DATABASE_URL").replace("postrgres://","postgresql+psycopg://")
+
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(bind=engine)
+
+class Base(DeclarativeBase):
+    pass
 
 def get_db():
-    with psycopg.connect(DATABASE_URL, row_factory = dict_row) as conn:
-        yield conn
+    with SessionLocal() as session:
+        yield session
 
-DB = Annotated[psycopg.Connection, Depends(get_db)]
+DB = Annotated[Session, Depends(get_db)]
